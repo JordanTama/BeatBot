@@ -1,21 +1,28 @@
 import processing.sound.*; //<>//
 
 State state;
-
+Controller controller;
 
 void setup()
 {
     size(800, 600);
     
     CreateMenus();
+    
+    controller = new Controller();
+    controller.Initialize();
 }
 
 void draw()
 {
+    // Once arduino has been integrated, get input with:
+    // int input = controller.GetFingerInput();
+    
     background(0);
     state.Draw();
 }
 
+// Remove this once arduino input has been implemented
 void keyPressed()
 {
     int inputIndex = -1;
