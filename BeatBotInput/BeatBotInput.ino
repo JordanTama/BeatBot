@@ -1,9 +1,11 @@
+const bool usingJoystick = false;
+
 const int aPin = A0;
 const int bPin = A1;
 const int cPin = A2;
 const int dPin = A3;
 
-const int threshold = 768;
+const int threshold = 256;
 
 void setup()
 {
@@ -12,15 +14,20 @@ void setup()
 
 void loop()
 {
-    if (analogRead(aPin) > threshold)
+    bool aDown = usingJoystick ? analogRead(aPin) < threshold / 2 : analogRead(aPin) >= 1023 - threshold;
+    bool bDown = usingJoystick ? analogRead(aPin) >= 1023 - threshold / 2 : analogRead(bPin) >= 1023 - threshold;
+    bool cDown = usingJoystick ? analogRead(bPin) < threshold / 2 : analogRead(cPin) >= 1023 - threshold;
+    bool dDown = usingJoystick ? analogRead(bPin) >= 1023 - threshold / 2 : analogRead(dPin) >= 1023 - threshold;
+
+    if (aDown)
         Serial.println("a");
 
-    if (analogRead(bPin) > threshold)
+    if (bDown)
         Serial.println("b");
 
-    if (analogRead(cPin) > threshold)
+    if (cDown)
         Serial.println("c");
 
-    if (analogRead(dPin) > threshold)
+    if (dDown)
         Serial.println("d");
 }
