@@ -24,6 +24,7 @@ static class SceneManager
     {
         if (index < 0 || index >= scenes.length)
             return;
+            
         currentSceneIndex = index;
     }
 }
