@@ -5,4 +5,5 @@ abstract class Interface
 
 abstract class InterfaceButton
 {
+    abstract void OnPress();
 }

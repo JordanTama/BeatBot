@@ -31,5 +31,6 @@ static class SceneManager
 
 abstract class Scene
 {
+    abstract void HandleInput(boolean[] inputs);
     abstract void Draw();
 }

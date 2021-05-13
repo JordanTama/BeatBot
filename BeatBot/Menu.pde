@@ -1,3 +1,12 @@
+class MenuScene extends Scene
+{
+    MenuInterface[] interfaces;
+    int currentInterface;
+    
+    void HandleInput(boolean[] inputs) {}
+    void Draw() {}
+}
+
 class MenuInterface extends Interface
 {
     InterfaceButton[] buttons;
@@ -6,6 +15,9 @@ class MenuInterface extends Interface
     void Draw() {}
 }
 
-class NavButton extends InterfaceButton
+class InterfaceNavButton extends InterfaceButton
 {
+    int sceneIndex;
+    
+    void OnPress() {}
 }
