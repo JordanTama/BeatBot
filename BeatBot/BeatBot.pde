@@ -6,8 +6,6 @@ import processing.sound.*;
 // Member variables
 static Controller controller;
 
-final boolean keyboardOverride = false;
-
 State state; // temporary
 
 
@@ -27,34 +25,53 @@ void setup()
 void draw()
 {
     HandleInput();
+    controller.Update();
+    
     SceneManager.Draw();
     
     state.currentMenu.Draw();
 }
 
 void keyPressed()
-{
-    if (keyboardOverride)
-        controller.Update();
-    else
-        return;
-    
+{    
     switch (key)
     {
         case '7':
-            controller.Override(0);
+            controller.Override(0, true);
             break;
             
         case '8':
-            controller.Override(1);
+            controller.Override(1, true);
             break;
             
         case '9':
-            controller.Override(2);
+            controller.Override(2, true);
             break;
             
         case '0':
-            controller.Override(3);
+            controller.Override(3, true);
+            break;
+    }
+}
+
+void keyReleased()
+{
+    switch (key)
+    {
+        case '7':
+            controller.Override(0, false);
+            break;
+            
+        case '8':
+            controller.Override(1, false);
+            break;
+            
+        case '9':
+            controller.Override(2, false);
+            break;
+            
+        case '0':
+            controller.Override(3, false);
             break;
     }
 }
@@ -63,9 +80,6 @@ void keyPressed()
 // Functions
 void HandleInput()
 {
-    if (!keyboardOverride)
-        controller.Update();
-
     boolean[] inputs = controller.GetValues();
     
     for (int i = 0; i < inputs.length; i++)

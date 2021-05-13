@@ -4,6 +4,13 @@ class Controller
     Serial port;
     Control[] controls;
     
+    final char[][] inputs = new char[][] {
+        new char[] {'a', 'A'},
+        new char[] {'b', 'B'},
+        new char[] {'c', 'C'},
+        new char[] {'d', 'D'}
+    };
+    
     
     Controller(BeatBot program)
     {
@@ -32,49 +39,33 @@ class Controller
         while (port.available() > 0)
         {
             char character = port.readChar();
-            switch (character)
+            
+            for (int i = 0; i < inputs.length; i++)
             {
-                case 'a':
-                    controls[0].TrySet();
-                    break;
-                    
-                case 'b':
-                    controls[1].TrySet();
-                    break;
-                    
-                case 'c':
-                    controls[2].TrySet();
-                    break;
-                    
-                case 'd':
-                    controls[3].TrySet();
-                    break;
-
-                case 'A':
-                    controls[0].Release();
-                    break;
-                    
-                case 'B':
-                    controls[1].Release();
-                    break;
-                    
-                case 'C':
-                    controls[2].Release();
-                    break;
-                    
-                case 'D':
-                    controls[3].Release();
-                    break;
+                if (inputs[i][0] == character)
+                    controls[i].TrySet();
+                else if (inputs[i][1] == character)
+                    controls[i].Release();
             }
         }
     }
     
-    void Override(int index)
-    {
-        if (index < 0 || index >= controls.length)
+    void Override(int index, boolean pressed)
+    {            
+        if (index < 0 || index >= inputs.length)
             return;
 
-        controls[index].TrySet();
+        if (port != null)
+        {
+            port.write(inputs[index][pressed ? 0 : 1]);
+        }
+        else
+        {
+            if (pressed)
+                controls[index].TrySet();
+            else
+                controls[index].Release();
+        }
     }
     
     boolean[] GetValues()
