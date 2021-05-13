@@ -33,6 +33,8 @@ class Menu
     
     public void Draw()
     {
+        background(0);
+        
         // Draw buttons
         buttonArea = (float) height / (tan(-buttonAngle));
         buttonWidth = (buttonArea / buttons.length) * sin(-buttonAngle);

@@ -1,54 +1,83 @@
-import processing.sound.*; //<>//
+// Libraries //<>//
+import processing.serial.*;
+import processing.sound.*;
 
-State state;
-Controller controller;
 
+// Member variables
+static Controller controller;
+
+final boolean keyboardOverride = true;
+
+State state; // temporary
+
+
+// Event functions
 void setup()
 {
     size(800, 600);
     
+    controller = new Controller(this);
+
+    state = new State(this);
     CreateMenus();
     
-    controller = new Controller();
-    controller.Initialize();
+    SceneManager.Initialise(this, new Scene[] {});
 }
 
 void draw()
 {
-    // Once arduino has been integrated, get input with:
-    // int input = controller.GetFingerInput();
+    HandleInput();
+    SceneManager.Draw();
     
-    background(0);
-    state.Draw();
+    state.currentMenu.Draw();
 }
 
-// Remove this once arduino input has been implemented
 void keyPressed()
 {
-    int inputIndex = -1;
+    if (keyboardOverride)
+        controller.Update();
+    else
+        return;
     
     switch (key)
     {
         case '7':
-            inputIndex = 0;
+            controller.Override(0);
             break;
             
         case '8':
-            inputIndex = 1;
+            controller.Override(1);
             break;
             
         case '9':
-            inputIndex = 2;
+            controller.Override(2);
             break;
             
         case '0':
-            inputIndex = 3;
+            controller.Override(3);
             break;
     }
-    
-    state.currentMenu.Select(inputIndex);
 }
 
+
+// Functions
+void HandleInput()
+{
+    if (!keyboardOverride)
+        controller.Update();
+
+    boolean[] inputs = controller.GetValues();
+    
+    for (int i = 0; i < inputs.length; i++)
+    {
+        if (!inputs[i])
+            continue;
+        
+        //SceneManager.Load(i);
+        state.currentMenu.Select(i);
+        return;
+    }
+}
 
 void CreateMenus()
 {

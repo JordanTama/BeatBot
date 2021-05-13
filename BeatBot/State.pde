@@ -2,9 +2,9 @@ class State
 {
     public Menu currentMenu;
     
-    private PApplet sketch;
+    private BeatBot sketch;
     
-    public State(PApplet sketch)
+    public State(BeatBot sketch)
     {
         this.sketch = sketch;
     }
