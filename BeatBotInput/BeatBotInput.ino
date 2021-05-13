@@ -1,4 +1,4 @@
-const bool usingJoystick = false;
+const bool usingJoystick = true;
 
 const int aPin = A0;
 const int bPin = A1;
@@ -19,15 +19,11 @@ void loop()
     bool cDown = usingJoystick ? analogRead(bPin) < threshold / 2 : analogRead(cPin) >= 1023 - threshold;
     bool dDown = usingJoystick ? analogRead(bPin) >= 1023 - threshold / 2 : analogRead(dPin) >= 1023 - threshold;
 
-    if (aDown)
-        Serial.println("a");
+    Serial.println(aDown ? "a" : "A");
 
-    if (bDown)
-        Serial.println("b");
+    Serial.println(bDown ? "b" : "B");
 
-    if (cDown)
-        Serial.println("c");
+    Serial.println(cDown ? "c" : "C");
 
-    if (dDown)
-        Serial.println("d");
+    Serial.println(dDown ? "d" : "D");
 }

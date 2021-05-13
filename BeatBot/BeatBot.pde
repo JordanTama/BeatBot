@@ -6,7 +6,7 @@ import processing.sound.*;
 // Member variables
 static Controller controller;
 
-final boolean keyboardOverride = true;
+final boolean keyboardOverride = false;
 
 State state; // temporary
 

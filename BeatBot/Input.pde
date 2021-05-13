@@ -49,6 +49,22 @@ class Controller
                 case 'd':
                     controls[3].TrySet();
                     break;
+
+                case 'A':
+                    controls[0].Release();
+                    break;
+                    
+                case 'B':
+                    controls[1].Release();
+                    break;
+                    
+                case 'C':
+                    controls[2].Release();
+                    break;
+                    
+                case 'D':
+                    controls[3].Release();
+                    break;
             }
         }
     }
@@ -84,6 +100,13 @@ class Control
             return;
 
         value = true;
+        isDown = true;
+    }
+    
+    void Release()
+    {
+        isDown = false;
+        value = false;
     }
     
     boolean GetValue()
