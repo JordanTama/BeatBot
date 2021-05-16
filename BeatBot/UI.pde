@@ -10,8 +10,18 @@ abstract class InterfaceButton
 
     final float buttonAngle = -PI * 0.22;
 
-    void OnPress() {
+    abstract void Invoke();
+
+    void Select() {
+        if (selected) {
+            Invoke();
+            selected = false;
+            Resources.confirmSound.play();
+            return;
+        }
+
         selected = true;
+        Resources.selectSound.play();
     }
     
     void Deselect() {
@@ -90,6 +100,7 @@ class LabelButton extends InterfaceButton
 {
     String label;
 
+
     LabelButton() {}
 
     LabelButton(String label)
@@ -97,9 +108,8 @@ class LabelButton extends InterfaceButton
         this.label = label;
     }
 
-    void OnPress() {
-        selected = true;
-    }
+
+    void Invoke() {}
 
     @Override
     void Draw(int buttonIndex, int totalButtons)
@@ -125,15 +135,15 @@ class ImageButton extends InterfaceButton
 {
     PImage icon;
 
+
     ImageButton() {}
 
     ImageButton(PImage icon) {
         this.icon = icon;
     }
 
-    void OnPress() {
-        selected = true;
-    }
+
+    void Invoke() {}
 
     @Override
     void Draw(int buttonIndex, int totalButtons) {

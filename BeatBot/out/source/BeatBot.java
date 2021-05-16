@@ -348,7 +348,7 @@ class MenuInterface extends Interface
             button.Deselect();
         }
 
-        buttons[index].OnPress();
+        buttons[index].Select();
     }
 }
 
@@ -365,16 +365,9 @@ class InterfaceNavButton extends LabelButton
         this.targetIndex = targetIndex;
     }
     
-    public void OnPress() {
-        if (selected)
-        {
-            scene.ChangeInterface(targetIndex);
-            selected = false;
-        }
-        else
-        {
-            super.OnPress();
-        }
+    public void Invoke() {
+        scene.ChangeInterface(targetIndex);
+        selected = false;
     }
 }
 
@@ -391,16 +384,9 @@ class InterfaceNavImageButton extends ImageButton
         this.targetIndex = targetIndex;
     }
     
-    public void OnPress() {
-        if (selected)
-        {
-            scene.ChangeInterface(targetIndex);
-            selected = false;
-        }
-        else
-        {
-            super.OnPress();
-        }
+    public void Invoke() {
+        scene.ChangeInterface(targetIndex);
+        selected = false;
     }
 }
 class Menu
@@ -576,7 +562,7 @@ static class Resources
     static PFont font;
 
     static SoundFile confirmSound;
-    static SoundFile retreatSound;
+    static SoundFile selectSound;
 
 
     public static void Initialise()
@@ -587,7 +573,7 @@ static class Resources
         font = BeatBot.instance.createFont("united-kingdom.otf", 1);
 
         confirmSound = new SoundFile(BeatBot.instance, "confirm.wav");
-        retreatSound = new SoundFile(BeatBot.instance, "back.wav");
+        selectSound = new SoundFile(BeatBot.instance, "back.wav");
     }
 }
 static class SceneManager
@@ -677,8 +663,18 @@ abstract class InterfaceButton
 
     final float buttonAngle = -PI * 0.22f;
 
-    public void OnPress() {
+    public abstract void Invoke();
+
+    public void Select() {
+        if (selected) {
+            Invoke();
+            selected = false;
+            Resources.confirmSound.play();
+            return;
+        }
+
         selected = true;
+        Resources.selectSound.play();
     }
     
     public void Deselect() {
@@ -757,6 +753,7 @@ class LabelButton extends InterfaceButton
 {
     String label;
 
+
     LabelButton() {}
 
     LabelButton(String label)
@@ -764,9 +761,8 @@ class LabelButton extends InterfaceButton
         this.label = label;
     }
 
-    public void OnPress() {
-        selected = true;
-    }
+
+    public void Invoke() {}
 
     public @Override
     void Draw(int buttonIndex, int totalButtons)
@@ -792,15 +788,15 @@ class ImageButton extends InterfaceButton
 {
     PImage icon;
 
+
     ImageButton() {}
 
     ImageButton(PImage icon) {
         this.icon = icon;
     }
 
-    public void OnPress() {
-        selected = true;
-    }
+
+    public void Invoke() {}
 
     public @Override
     void Draw(int buttonIndex, int totalButtons) {

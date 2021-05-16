@@ -6,7 +6,7 @@ static class Resources
     static PFont font;
 
     static SoundFile confirmSound;
-    static SoundFile retreatSound;
+    static SoundFile selectSound;
 
 
     static void Initialise()
@@ -17,6 +17,6 @@ static class Resources
         font = BeatBot.instance.createFont("united-kingdom.otf", 1);
 
         confirmSound = new SoundFile(BeatBot.instance, "confirm.wav");
-        retreatSound = new SoundFile(BeatBot.instance, "back.wav");
+        selectSound = new SoundFile(BeatBot.instance, "back.wav");
     }
 }

@@ -105,7 +105,7 @@ class MenuInterface extends Interface
             button.Deselect();
         }
 
-        buttons[index].OnPress();
+        buttons[index].Select();
     }
 }
 
@@ -122,16 +122,9 @@ class InterfaceNavButton extends LabelButton
         this.targetIndex = targetIndex;
     }
     
-    void OnPress() {
-        if (selected)
-        {
-            scene.ChangeInterface(targetIndex);
-            selected = false;
-        }
-        else
-        {
-            super.OnPress();
-        }
+    void Invoke() {
+        scene.ChangeInterface(targetIndex);
+        selected = false;
     }
 }
 
@@ -148,15 +141,8 @@ class InterfaceNavImageButton extends ImageButton
         this.targetIndex = targetIndex;
     }
     
-    void OnPress() {
-        if (selected)
-        {
-            scene.ChangeInterface(targetIndex);
-            selected = false;
-        }
-        else
-        {
-            super.OnPress();
-        }
+    void Invoke() {
+        scene.ChangeInterface(targetIndex);
+        selected = false;
     }
 }
