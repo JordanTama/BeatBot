@@ -27,6 +27,10 @@ static class SceneManager
             return;
             
         currentSceneIndex = index;
+
+        Scene activeScene = ActiveScene();
+        if (activeScene != null)
+            activeScene.OnLoad();
     }
 
     static void HandleInput(boolean[] inputs)
@@ -48,7 +52,14 @@ static class SceneManager
 abstract class Scene
 {
     Interface[] interfaces;
+    int currentInterface;
+    
     abstract void HandleInput(boolean[] inputs);
     abstract void Draw();
-    abstract void ChangeInterface(int index);
+    
+    void ChangeInterface(int index) {
+        currentInterface = index;
+    }
+
+    void OnLoad() {}
 }

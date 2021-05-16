@@ -99,6 +99,12 @@ public void HandleInput()
 
     controller.Update();
 }
+class GameScene extends Scene
+{
+    public void HandleInput(boolean[] inputs) {}
+    
+    public void Draw() {}
+}
 class Controller
 {    
     Serial port;
@@ -171,11 +177,7 @@ class Controller
         boolean[] values = new boolean[controls.length];
         
         for (int i = 0; i < controls.length; i++)
-        {
             values[i] = controls[i].GetValue();
-            if (values[i])
-                println("Input '" + inputs[i][0] + "' detected.");
-        }
             
         return values;
     }
@@ -211,32 +213,30 @@ class Control
 }
 class MenuScene extends Scene
 {
-    int currentInterface;
-
     public MenuScene()
     {
         interfaces = new Interface[] {
             new MenuInterface(new Button[] {
+                new InterfaceNavButton(this, 1, "Play"),
+                new InterfaceNavButton(this, 2, "Options"),
+                new InterfaceNavButton(this, 3, "Help"),
+                null
+            }),
+            new MenuInterface(new Button[] {
                 new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 2, "Medium"),
-                new InterfaceNavButton(this, 3, "Hard"),
+                new InterfaceNavButton(this, 1, "Medium"),
+                new InterfaceNavButton(this, 1, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
                 null,
-                new InterfaceNavButton(this, 2, "Medium"),
-                new InterfaceNavButton(this, 3, "Hard"),
-                new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
-            new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
                 null,
-                new InterfaceNavButton(this, 3, "Hard"),
+                null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 2, "Medium"),
+                null,
+                null,
                 null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
@@ -279,11 +279,6 @@ class MenuScene extends Scene
             return;
         
         interfaces[currentInterface].Draw();
-    }
-
-    public void ChangeInterface(int index)
-    {
-        currentInterface = index;
     }
 }
 
@@ -408,6 +403,10 @@ static class SceneManager
             return;
             
         currentSceneIndex = index;
+
+        Scene activeScene = ActiveScene();
+        if (activeScene != null)
+            activeScene.OnLoad();
     }
 
     public static void HandleInput(boolean[] inputs)
@@ -429,9 +428,16 @@ static class SceneManager
 abstract class Scene
 {
     Interface[] interfaces;
+    int currentInterface;
+    
     public abstract void HandleInput(boolean[] inputs);
     public abstract void Draw();
-    public abstract void ChangeInterface(int index);
+    
+    public void ChangeInterface(int index) {
+        currentInterface = index;
+    }
+
+    public void OnLoad() {}
 }
 abstract class Interface
 {

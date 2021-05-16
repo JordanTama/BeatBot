@@ -70,11 +70,7 @@ class Controller
         boolean[] values = new boolean[controls.length];
         
         for (int i = 0; i < controls.length; i++)
-        {
             values[i] = controls[i].GetValue();
-            if (values[i])
-                println("Input '" + inputs[i][0] + "' detected.");
-        }
             
         return values;
     }

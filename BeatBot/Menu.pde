@@ -1,31 +1,29 @@
 class MenuScene extends Scene
 {
-    int currentInterface;
-
     public MenuScene()
     {
         interfaces = new Interface[] {
             new MenuInterface(new Button[] {
+                new InterfaceNavButton(this, 1, "Play"),
+                new InterfaceNavButton(this, 2, "Options"),
+                new InterfaceNavButton(this, 3, "Help"),
+                null
+            }),
+            new MenuInterface(new Button[] {
                 new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 2, "Medium"),
-                new InterfaceNavButton(this, 3, "Hard"),
+                new InterfaceNavButton(this, 1, "Medium"),
+                new InterfaceNavButton(this, 1, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
                 null,
-                new InterfaceNavButton(this, 2, "Medium"),
-                new InterfaceNavButton(this, 3, "Hard"),
-                new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
-            new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
                 null,
-                new InterfaceNavButton(this, 3, "Hard"),
+                null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 2, "Medium"),
+                null,
+                null,
                 null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
@@ -68,11 +66,6 @@ class MenuScene extends Scene
             return;
         
         interfaces[currentInterface].Draw();
-    }
-
-    void ChangeInterface(int index)
-    {
-        currentInterface = index;
     }
 }
 
