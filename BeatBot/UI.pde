@@ -25,12 +25,12 @@ abstract class InterfaceButton
 
     float CalculateTotalWidth()
     {
-        return (float) BeatBot.instance.height / (tan(-buttonAngle));
+        return (float) height / (tan(-buttonAngle));
     }
 
     float CalculateRectLength(int buttonIndex, int totalButtons)
     {
-        return ((BeatBot.instance.height / (float) totalButtons) * (totalButtons - buttonIndex)) / (sin(-buttonAngle));
+        return ((height / (float) totalButtons) * (totalButtons - buttonIndex)) / (sin(-buttonAngle));
     }
 
     void Draw(int buttonIndex, int totalButtons)
@@ -55,7 +55,7 @@ abstract class InterfaceButton
 
         float totalWidth = CalculateTotalWidth();
 
-        translate(BeatBot.instance.width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, BeatBot.instance.height);
+        translate(width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, height);
         rotate(buttonAngle);
     }
 
@@ -157,5 +157,7 @@ class ImageButton extends InterfaceButton
         image(icon, 0, 0, 50, 50);
         
         popMatrix();
+
+        tint(255);
     }
 }

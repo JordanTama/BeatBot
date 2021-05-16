@@ -48,7 +48,22 @@ class MenuScene extends Scene
 
     void Draw() {
         background(0);
+
+        // Draw icons
+        float aspect = Resources.logoImage.width / Resources.logoImage.height;
+        float sizeMax = width * .4;
+        float xPos = width * 0.25;
+        float yPos = height * 0.25;
+
+        imageMode(CENTER);
+        image(Resources.logoImage, xPos, yPos, sizeMax, sizeMax * aspect);
+
+        textAlign(CENTER, TOP);
+        fill(202, 109, 228, 255);
+        textSize(40);
+        text("Main Menu", xPos - sizeMax / 2, yPos + sizeMax / 2, sizeMax, 100);
         
+        // Draw Interfaces
         if (interfaces.length == 0)
             return;
         

@@ -38,6 +38,7 @@ public void setup()
     controller = new Controller();
 
     
+    textFont(Resources.font);
 }
 
 public void draw()
@@ -290,7 +291,22 @@ class MenuScene extends Scene
 
     public void Draw() {
         background(0);
+
+        // Draw icons
+        float aspect = Resources.logoImage.width / Resources.logoImage.height;
+        float sizeMax = width * .4f;
+        float xPos = width * 0.25f;
+        float yPos = height * 0.25f;
+
+        imageMode(CENTER);
+        image(Resources.logoImage, xPos, yPos, sizeMax, sizeMax * aspect);
+
+        textAlign(CENTER, TOP);
+        fill(202, 109, 228, 255);
+        textSize(40);
+        text("Main Menu", xPos - sizeMax / 2, yPos + sizeMax / 2, sizeMax, 100);
         
+        // Draw Interfaces
         if (interfaces.length == 0)
             return;
         
@@ -554,11 +570,24 @@ class Menu
 }
 static class Resources
 {
+    static PImage logoImage;
     static PImage homeImage;
+    
+    static PFont font;
+
+    static SoundFile confirmSound;
+    static SoundFile retreatSound;
+
 
     public static void Initialise()
     {
+        logoImage = BeatBot.instance.loadImage("logo.png");
         homeImage = BeatBot.instance.loadImage("back.png");
+
+        font = BeatBot.instance.createFont("united-kingdom.otf", 1);
+
+        confirmSound = new SoundFile(BeatBot.instance, "confirm.wav");
+        retreatSound = new SoundFile(BeatBot.instance, "back.wav");
     }
 }
 static class SceneManager
@@ -663,12 +692,12 @@ abstract class InterfaceButton
 
     public float CalculateTotalWidth()
     {
-        return (float) BeatBot.instance.height / (tan(-buttonAngle));
+        return (float) height / (tan(-buttonAngle));
     }
 
     public float CalculateRectLength(int buttonIndex, int totalButtons)
     {
-        return ((BeatBot.instance.height / (float) totalButtons) * (totalButtons - buttonIndex)) / (sin(-buttonAngle));
+        return ((height / (float) totalButtons) * (totalButtons - buttonIndex)) / (sin(-buttonAngle));
     }
 
     public void Draw(int buttonIndex, int totalButtons)
@@ -693,7 +722,7 @@ abstract class InterfaceButton
 
         float totalWidth = CalculateTotalWidth();
 
-        translate(BeatBot.instance.width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, BeatBot.instance.height);
+        translate(width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, height);
         rotate(buttonAngle);
     }
 
@@ -795,6 +824,8 @@ class ImageButton extends InterfaceButton
         image(icon, 0, 0, 50, 50);
         
         popMatrix();
+
+        tint(255);
     }
 }
     public void settings() {  size(800, 600); }

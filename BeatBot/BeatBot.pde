@@ -19,6 +19,7 @@ void setup()
     controller = new Controller();
 
     size(800, 600);
+    textFont(Resources.font);
 }
 
 void draw()
