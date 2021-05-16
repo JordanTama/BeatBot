@@ -5,25 +5,25 @@ class MenuScene extends Scene
     public MenuScene()
     {
         interfaces = new Interface[] {
-            new MenuInterface(new InterfaceButton[] {
+            new MenuInterface(new Button[] {
                 new InterfaceNavButton(this, 1, "Easy"),
                 new InterfaceNavButton(this, 2, "Medium"),
                 new InterfaceNavButton(this, 3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
-            new MenuInterface(new InterfaceButton[] {
+            new MenuInterface(new Button[] {
                 null,
                 new InterfaceNavButton(this, 2, "Medium"),
                 new InterfaceNavButton(this, 3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
-            new MenuInterface(new InterfaceButton[] {
+            new MenuInterface(new Button[] {
                 new InterfaceNavButton(this, 1, "Easy"),
                 null,
                 new InterfaceNavButton(this, 3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
-            new MenuInterface(new InterfaceButton[] {
+            new MenuInterface(new Button[] {
                 new InterfaceNavButton(this, 1, "Easy"),
                 new InterfaceNavButton(this, 2, "Medium"),
                 null,
@@ -78,9 +78,9 @@ class MenuScene extends Scene
 
 class MenuInterface extends Interface
 {
-    InterfaceButton[] buttons;
+    Button[] buttons;
     
-    public MenuInterface(InterfaceButton[] buttons)
+    public MenuInterface(Button[] buttons)
     {
         this.buttons = buttons;
     }
@@ -98,7 +98,7 @@ class MenuInterface extends Interface
         if (index < 0 || index >= buttons.length || buttons[index] == null)
             return;
 
-        for (InterfaceButton button : buttons){
+        for (Button button : buttons){
             if (button == null || button == buttons[index])
                 continue;
             

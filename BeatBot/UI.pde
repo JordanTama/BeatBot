@@ -4,7 +4,7 @@ abstract class Interface
     abstract void Select(int index);
 }
 
-abstract class InterfaceButton
+abstract class Button
 {
     boolean selected;
 
@@ -96,7 +96,7 @@ abstract class InterfaceButton
     }
 }
 
-class LabelButton extends InterfaceButton
+class LabelButton extends Button
 {
     String label;
 
@@ -131,7 +131,7 @@ class LabelButton extends InterfaceButton
     }
 }
 
-class ImageButton extends InterfaceButton
+class ImageButton extends Button
 {
     PImage icon;
 
