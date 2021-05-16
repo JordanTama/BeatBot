@@ -1,35 +1,30 @@
-// Libraries //<>//
+// LIBRARIES
 import processing.serial.*;
 import processing.sound.*;
 
 
-// Member variables
+// MEMBER VARIABLES
 static Controller controller;
+static BeatBot instance;
 
-State state; // temporary
 
-
-// Event functions
+// EVENT FUNCTIONS
 void setup()
 {
-    size(800, 600);
-    
-    controller = new Controller(this);
+    instance = this;
 
-    state = new State(this);
-    CreateMenus();
-    
-    SceneManager.Initialise(this, new Scene[] {});
+    Resources.Initialise();
+    SceneManager.Initialise();
+
+    controller = new Controller();
+
+    size(800, 600);
 }
 
 void draw()
 {
     HandleInput();
-    controller.Update();
-    
     SceneManager.Draw();
-    
-    state.currentMenu.Draw();
 }
 
 void keyPressed()
@@ -76,64 +71,11 @@ void keyReleased()
     }
 }
 
-
-// Functions
+// FUNCTIONS
 void HandleInput()
 {
     boolean[] inputs = controller.GetValues();
-    
-    for (int i = 0; i < inputs.length; i++)
-    {
-        if (!inputs[i])
-            continue;
-        
-        //SceneManager.Load(i);
-        state.currentMenu.Select(i);
-        return;
-    }
-}
+    SceneManager.HandleInput(inputs);
 
-void CreateMenus()
-{
-    state = new State(this);
-    
-    Menu mainMenu = new Menu(state, "Main Menu");
-    Menu easyMenu = new Menu(state, "Easy");
-    Menu mediumMenu = new Menu(state, "Medium");
-    Menu hardMenu = new Menu(state, "Hard");
-    
-    
-    Button[] mainButtons = {
-        new Button(easyMenu, "EASY"),
-        new Button(mediumMenu, "MEDIUM"),
-        new Button(hardMenu, "HARD"),
-        new Button(mainMenu, "")
-    };
-    mainMenu.SetButtons(mainButtons);
-    
-    Button[] easyButtons = {
-        new Button(mediumMenu, "MEDIUM"),
-        new Button(hardMenu, "HARD"),
-        null,
-        new Button(mainMenu, "")
-    };
-    easyMenu.SetButtons(easyButtons);
-    
-    Button[] mediumButtons = {
-        new Button(easyMenu, "EASY"),
-        new Button(hardMenu, "HARD"),
-        null,
-        new Button(mainMenu, "")
-    };
-    mediumMenu.SetButtons(mediumButtons);
-    
-    Button[] hardButtons = {
-        new Button(easyMenu, "EASY"),
-        new Button(mediumMenu, "MEDIUM"),
-        null,
-        new Button(mainMenu, "")
-    };
-    hardMenu.SetButtons(hardButtons);
-    
-    state.Start(mainMenu);
+    controller.Update();
 }

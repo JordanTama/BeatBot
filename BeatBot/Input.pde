@@ -1,6 +1,5 @@
 class Controller
 {    
-    BeatBot program;
     Serial port;
     Control[] controls;
     
@@ -12,10 +11,8 @@ class Controller
     };
     
     
-    Controller(BeatBot program)
-    {
-        this.program = program;
-        
+    Controller()
+    {        
         controls = new Control[] {
             new Control(),
             new Control(),
@@ -24,7 +21,7 @@ class Controller
         };
         
         if (Serial.list().length > 0)
-            port = new Serial(program, Serial.list()[0], 9600);
+            port = new Serial(BeatBot.instance, Serial.list()[0], 9600);
     }
     
     
@@ -51,7 +48,7 @@ class Controller
     }
     
     void Override(int index, boolean pressed)
-    {            
+    {
         if (index < 0 || index >= inputs.length)
             return;
 
@@ -73,7 +70,11 @@ class Controller
         boolean[] values = new boolean[controls.length];
         
         for (int i = 0; i < controls.length; i++)
+        {
             values[i] = controls[i].GetValue();
+            if (values[i])
+                println("Input '" + inputs[i][0] + "' detected.");
+        }
             
         return values;
     }

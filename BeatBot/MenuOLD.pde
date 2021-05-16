@@ -79,7 +79,11 @@ class Menu
         float rectLength = ((height / (float) buttons.length) * (buttons.length - index)) / (sin(-buttonAngle));//sqrt(pow(width, 2) + pow(height, 2));
         rect(0, 0, rectLength, buttonWidth);
         
-        fill(255);
+        if (buttons[index].highlighted)
+            fill(255);
+        else
+            fill(0);
+        
         textSize(50);
         textAlign(CENTER, CENTER);
         text(buttons[index].name, 0, 0, rectLength, buttonWidth);
@@ -149,5 +153,13 @@ class Menu
             nextSound.play();
             
         buttons[index].OnSelect();
+        
+        for (Button button : buttons)
+        {
+            if (button == buttons[index])
+                continue;
+            
+            button.OnDeselect();
+        }
     }
 }

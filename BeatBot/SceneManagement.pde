@@ -1,23 +1,24 @@
 static class SceneManager
 {
-    static BeatBot program;
-    static int currentSceneIndex;
-    
+    static int currentSceneIndex;   
     static Scene[] scenes;
     
-    static void Initialise(BeatBot sketch, Scene[] sketchScenes)
+    static void Initialise()
     {
-        program = sketch;
         currentSceneIndex = 0;
-        scenes = sketchScenes;
+        scenes = new Scene[] {
+            BeatBot.instance.new MenuScene()
+        };
     }
     
     static void Draw()
     {
-        if (scenes.length == 0)
+        Scene activeScene = ActiveScene();
+
+        if (activeScene == null)
             return;
             
-        scenes[currentSceneIndex].Draw();
+        activeScene.Draw();
     }
     
     static void Load(int index)
@@ -27,10 +28,27 @@ static class SceneManager
             
         currentSceneIndex = index;
     }
+
+    static void HandleInput(boolean[] inputs)
+    {
+        Scene activeScene = ActiveScene();
+
+        if (activeScene == null)
+            return;
+
+        activeScene.HandleInput(inputs);
+    }
+
+    static Scene ActiveScene()
+    {
+        return scenes.length == 0 ? null : scenes[currentSceneIndex];
+    }
 }
 
 abstract class Scene
 {
+    Interface[] interfaces;
     abstract void HandleInput(boolean[] inputs);
     abstract void Draw();
+    abstract void ChangeInterface(int index);
 }

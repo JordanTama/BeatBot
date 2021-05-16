@@ -4,6 +4,7 @@ class Button
     private State state;
     
     public String name;
+    public boolean highlighted;
     
     public Button(Menu next, String name)
     {
@@ -18,6 +19,14 @@ class Button
     
     public void OnSelect()
     {
-        state.currentMenu = next;
+        if (highlighted)
+            state.currentMenu = next;
+        else
+            highlighted = true;
+    }
+    
+    public void OnDeselect()
+    {
+        highlighted = false;
     }
 }
