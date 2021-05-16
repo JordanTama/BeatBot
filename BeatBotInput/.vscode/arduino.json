@@ -1,4 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "BeatBotInput.ino"
+    "sketch": "BeatBotInput.ino",
+    "port": "COM3"
 }
