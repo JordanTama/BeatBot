@@ -10,9 +10,9 @@ class MenuScene extends Scene
                 null
             }),
             new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 1, "Medium"),
-                new InterfaceNavButton(this, 1, "Hard"),
+                new SceneNavButton(1, "Easy"),
+                new SceneNavButton(1, "Medium"),
+                new SceneNavButton(1, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
@@ -136,6 +136,23 @@ class InterfaceNavImageButton extends ImageButton
     
     void Invoke() {
         scene.ChangeInterface(targetIndex);
+        selected = false;
+    }
+}
+
+class SceneNavButton extends LabelButton
+{
+    int targetIndex;
+
+    SceneNavButton(int targetIndex, String label)
+    {
+        super(label);
+
+        this.targetIndex = targetIndex;
+    }
+    
+    void Invoke() {
+        SceneManager.Load(targetIndex);
         selected = false;
     }
 }

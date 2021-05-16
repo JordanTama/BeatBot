@@ -7,7 +7,8 @@ static class SceneManager
     {
         currentSceneIndex = 0;
         scenes = new Scene[] {
-            BeatBot.instance.new MenuScene()
+            BeatBot.instance.new MenuScene(),
+            BeatBot.instance.new GameScene()
         };
     }
     

@@ -102,8 +102,12 @@ public void HandleInput()
 class GameScene extends Scene
 {
     public void HandleInput(boolean[] inputs) {}
-    
-    public void Draw() {}
+
+    public void OnLoad() {}
+
+    public void Draw() {
+        background(0);
+    }
 }
 class Controller
 {    
@@ -223,9 +227,9 @@ class MenuScene extends Scene
                 null
             }),
             new MenuInterface(new Button[] {
-                new InterfaceNavButton(this, 1, "Easy"),
-                new InterfaceNavButton(this, 1, "Medium"),
-                new InterfaceNavButton(this, 1, "Hard"),
+                new SceneNavButton(1, "Easy"),
+                new SceneNavButton(1, "Medium"),
+                new SceneNavButton(1, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
@@ -352,6 +356,23 @@ class InterfaceNavImageButton extends ImageButton
         selected = false;
     }
 }
+
+class SceneNavButton extends LabelButton
+{
+    int targetIndex;
+
+    SceneNavButton(int targetIndex, String label)
+    {
+        super(label);
+
+        this.targetIndex = targetIndex;
+    }
+    
+    public void Invoke() {
+        SceneManager.Load(targetIndex);
+        selected = false;
+    }
+}
 static class Resources
 {
     static PImage logoImage;
@@ -383,7 +404,8 @@ static class SceneManager
     {
         currentSceneIndex = 0;
         scenes = new Scene[] {
-            BeatBot.instance.new MenuScene()
+            BeatBot.instance.new MenuScene(),
+            BeatBot.instance.new GameScene()
         };
     }
     
