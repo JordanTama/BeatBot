@@ -50,8 +50,9 @@ abstract class Button
         
         PushMatrix(buttonIndex, totalButtons);
 
+        rectMode(CORNER);
         strokeWeight(0);
-        SetColour(buttonIndex);
+        Resources.SetColour(buttonIndex);
 
         float rectLength = CalculateRectLength(buttonIndex, totalButtons);
         rect(0, 0, rectLength, buttonWidth);
@@ -67,32 +68,6 @@ abstract class Button
 
         translate(width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, height);
         rotate(buttonAngle);
-    }
-
-    void SetColour(int buttonIndex)
-    {
-        switch (buttonIndex)
-        {
-            case 0:
-                fill(37, 255, 195, 255);
-                break;
-                
-            case 1:
-                fill(14, 20, 252, 255);
-                break;
-                
-            case 2:
-                fill(236, 62, 200, 255);
-                break;
-                
-            case 3:
-                fill(114, 8, 188, 255);
-                break;
-            
-            default:
-                fill(255);
-                break;
-        };
     }
 }
 

@@ -6,10 +6,15 @@ static class SceneManager
     static void Initialise()
     {
         currentSceneIndex = 0;
+        
         scenes = new Scene[] {
             BeatBot.instance.new MenuScene(),
-            BeatBot.instance.new GameScene()
+            BeatBot.instance.new GameScene(0, 90),
+            BeatBot.instance.new GameScene(1, 90),
+            BeatBot.instance.new GameScene(2, 90)
         };
+
+        Load(0);
     }
     
     static void Draw()
@@ -26,7 +31,9 @@ static class SceneManager
     {
         if (index < 0 || index >= scenes.length)
             return;
-            
+        
+        scenes[currentSceneIndex].OnUnload();
+
         currentSceneIndex = index;
 
         Scene activeScene = ActiveScene();
@@ -63,4 +70,6 @@ abstract class Scene
     }
 
     void OnLoad() {}
+
+    void OnUnload() {}
 }

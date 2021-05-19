@@ -101,12 +101,334 @@ public void HandleInput()
 }
 class GameScene extends Scene
 {
-    public void HandleInput(boolean[] inputs) {}
+    // Member variables
+    SoundFile track;
 
-    public void OnLoad() {}
+    float startTime;
+    float time;
+
+    float beatTime;
+    float beatTotal;
+
+    int difficultyIndex;
+    
+    float bpm;
+
+    int missed = 0;
+    float score = 0;
+    float buffer = 4;
+    float lenience = 1;
+
+    float laneWidth = 110;
+    float startHeight = -100;
+    float endHeight = height - 200;
+
+    ArrayList<Note> notes = new ArrayList<Note>();
+    ArrayList<Note> activeNotes = new ArrayList<Note>();
+
+
+    GameScene(int difficultyIndex, int bpm) {
+        this.difficultyIndex = difficultyIndex;
+        this.bpm = bpm;
+    }
+
+
+    // Event functions
+    public void OnLoad() {
+        track = Resources.GetTrack(difficultyIndex);
+
+        time = 0;
+        startTime = millis();
+
+        beatTime = -buffer * 2;
+        beatTotal = (track.duration() / 60.0f * bpm) + beatTime;
+
+        CreateNotes();
+
+        track.play(1, 0, 0.1f);
+    }
+
+    public void HandleInput(boolean[] inputs) {
+        for (int i = 0; i < inputs.length; i++)
+        {
+            if (!inputs[i])
+                continue;
+            
+            for (Note note : activeNotes)
+            {
+                if (note.inputIndex == i && abs(note.beat - beatTime) < lenience && !note.triggered)
+                {
+                    note.Trigger(beatTime);
+                    score ++;
+                    missed = 0;
+                    break;
+                }
+            }
+        }
+    }
 
     public void Draw() {
+        HandleTimer();
+
+        // Spawn in notes
+        UpdateActive();
+
+        // Draw the background
         background(0);
+        for (int i = 0; i < 4; i++)
+            DrawLane(i);
+
+        // Draw the Notes
+        for (Note note : activeNotes)
+            DrawNote(note);
+
+        // Draw the UI
+        DrawEndLine();
+        DrawText();
+
+        if (beatTime > beatTotal + buffer || missed >= 10)
+            EndGame();
+    }
+
+    // Functions
+    public void CreateNotes() {
+        // TODO: Go through the .dat file and convert to Notes.
+
+        float pos = 0;
+
+        while (pos <= beatTotal) {
+            float t = pos;
+
+            switch (difficultyIndex) {
+                case 0:
+                    t += RandomOffsetEasy();
+                    break;
+
+                case 1:
+                    t += RandomOffsetMedium();
+                    break;
+                
+                default:
+                    t += RandomOffsetHard();
+                    break;
+            }
+            pos = t;
+
+            int index = (int) random(0, 4);
+
+            notes.add(new Note(index, pos, 0));
+        }
+    }
+
+    public float RandomOffsetEasy() {
+        int rand = (int) random(0, 4);
+        switch (rand) {
+            case 0:
+                return 1;
+
+            case 1:
+                return 1.5f;
+            
+            case 2:
+                return 2;
+            
+            case 3:
+                return 2.5f;
+            
+            default:
+                return 3;
+        }
+    }
+
+    public float RandomOffsetMedium() {
+        int rand = (int) random(0, 4);
+        switch (rand) {
+            case 0:
+                return 0.5f;
+
+            case 1:
+                return 1;
+            
+            case 2:
+                return 1.5f;
+            
+            case 3:
+                return 2;
+            
+            default:
+                return 3;
+        }
+    }
+
+    public float RandomOffsetHard() {
+        int rand = (int) random(0, 4);
+        switch (rand) {
+            case 0:
+                return 0.25f;
+
+            case 1:
+                return 0.5f;
+            
+            case 2:
+                return 1;
+            
+            case 3:
+                return 1.5f;
+            
+            default:
+                return 2;
+        }
+    }
+
+    public void UpdateActive() {
+        for (int i = activeNotes.size() - 1; i >= 0; i--)
+        {
+            Note note = activeNotes.get(i);
+            if (note.triggered && note.triggerStart + note.triggerDuration < beatTime)
+            {
+                activeNotes.remove(i);
+            }
+            else if (note.beat + buffer < beatTime)
+            {
+                activeNotes.remove(i);
+                missed++;
+            }
+        }
+
+        for (Note note : notes)
+        {
+            if (beatTime + buffer < note.beat)
+                break;
+            
+            activeNotes.add(note);
+        }
+
+        for (int i = notes.size() - 1; i >= 0; i--)
+        {
+            if (activeNotes.contains(notes.get(i)))
+                notes.remove(i);
+        }
+    }
+
+    public void DrawNote(Note note) {
+        PImage img = Resources.GetNote(note.inputIndex);
+
+        float x = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
+        float y = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
+
+        imageMode(CENTER);
+        tint(255, 255, 255, note.triggered ? map(beatTime, note.triggerStart, note.triggerStart + note.triggerDuration, 255, 0) : 255);
+        image(img, x, y, 70, 70);
+    }
+
+    public void DrawLane(int laneIndex) {
+        Resources.SetColour(laneIndex);
+        
+        imageMode(CENTER);
+        noStroke();
+
+        float x = (width - laneWidth * 3) / 2 + laneIndex * laneWidth;
+        float y = height / 2;
+
+        image(Resources.laneImage, x, y, laneWidth, height);
+    }
+
+    public void DrawEndLine() {
+        
+        strokeWeight(5);
+        int x = 0;
+        while (x < width) {
+            stroke(255);
+            line(x, endHeight, x += 15, endHeight);
+            noStroke();
+            line(x, endHeight, x += 10, endHeight);
+        }
+    }
+
+    public void DrawText() {
+        float x = width - (width - laneWidth * 4) / 4;
+        float y = 30;
+
+        rectMode(CENTER);
+        textAlign(CENTER);
+        textSize(18);
+
+        fill(255);
+        text("Score", x, y, 100, 30);
+        y += 30;
+
+        fill(236, 62, 200, 255);
+        text("" + ((int) score), x, y, 100, 30);
+
+        String difficultyLabel = "";
+        switch (difficultyIndex) {
+            case 0:
+                difficultyLabel = "easy";
+                break;
+
+            case 1:
+                difficultyLabel = "medium";
+                break;
+
+            case 2:
+                difficultyLabel = "hard";
+                break;
+        }
+
+        x = (width - laneWidth * 4) / 4;
+        y = 30;
+
+        fill(255);
+        text("Level", x, y, 100, 30);
+        y += 30;
+
+        fill(236, 62, 200, 255);
+        text(difficultyLabel, x, y, 100, 30);
+    }
+
+    public float HandleTimer() {
+        float currentTime = millis() - startTime;
+        float delta = (currentTime - time) / 60000 * bpm;
+        time = currentTime;
+
+        beatTime += delta;
+
+        return delta;
+    }
+
+    public void EndGame() {
+        println("End game");
+        track.stop();
+        SceneManager.Load(0);
+    }
+}
+
+class Note
+{
+    int inputIndex;
+
+    float beat;
+    float duration;
+
+    boolean triggered = false;
+    float triggerStart = 0;
+
+    final float triggerDuration = 1;
+
+    public Note(int inputIndex, float beat, float duration)
+    {
+        this.inputIndex = inputIndex;
+        this.beat = beat;
+        this.duration = duration;
+    }
+
+    public void Trigger(float beatTime) {
+        if (triggered)
+            return;
+        
+        triggered = true;
+        triggerStart = beatTime;
+        Resources.selectSound.play();
     }
 }
 class Controller
@@ -228,8 +550,8 @@ class MenuScene extends Scene
             }),
             new MenuInterface(new Button[] {
                 new SceneNavButton(1, "Easy"),
-                new SceneNavButton(1, "Medium"),
-                new SceneNavButton(1, "Hard"),
+                new SceneNavButton(2, "Medium"),
+                new SceneNavButton(3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
@@ -245,6 +567,14 @@ class MenuScene extends Scene
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
         };
+    }
+
+    public void OnLoad() {
+        Resources.menuTrack.loop(1, 0.01f);
+    }
+
+    public void OnUnload() {
+        Resources.menuTrack.stop();
     }
     
     public void HandleInput(boolean[] inputs) {
@@ -270,6 +600,7 @@ class MenuScene extends Scene
         float xPos = width * 0.25f;
         float yPos = height * 0.25f;
 
+        tint(255);
         imageMode(CENTER);
         image(Resources.logoImage, xPos, yPos, sizeMax, sizeMax * aspect);
 
@@ -377,22 +708,112 @@ static class Resources
 {
     static PImage logoImage;
     static PImage homeImage;
+    static PImage laneImage;
+
+    static PImage aNote;
+    static PImage bNote;
+    static PImage cNote;
+    static PImage dNote;
     
     static PFont font;
 
     static SoundFile confirmSound;
     static SoundFile selectSound;
 
+    static SoundFile menuTrack;
+
+    static SoundFile easyTrack;
+    static SoundFile mediumTrack;
+    static SoundFile hardTrack;
+
 
     public static void Initialise()
     {
         logoImage = BeatBot.instance.loadImage("logo.png");
         homeImage = BeatBot.instance.loadImage("back.png");
+        laneImage = BeatBot.instance.loadImage("lane.png");
+
+        aNote = BeatBot.instance.loadImage("aNote.png");
+        bNote = BeatBot.instance.loadImage("bNote.png");
+        cNote = BeatBot.instance.loadImage("cNote.png");
+        dNote = BeatBot.instance.loadImage("dNote.png");
 
         font = BeatBot.instance.createFont("united-kingdom.otf", 1);
 
         confirmSound = new SoundFile(BeatBot.instance, "confirm.wav");
         selectSound = new SoundFile(BeatBot.instance, "back.wav");
+
+        menuTrack = new SoundFile(BeatBot.instance, "menuTrack.wav");
+
+        easyTrack = new SoundFile(BeatBot.instance, "easyTrack.wav");
+        mediumTrack = new SoundFile(BeatBot.instance, "mediumTrack.wav");
+        hardTrack = new SoundFile(BeatBot.instance, "hardTrack.wav");
+    }
+
+    public static SoundFile GetTrack(int trackIndex) {
+        switch (trackIndex) {
+            case 0:
+                return easyTrack;
+            
+            case 1:
+                return mediumTrack;
+            
+            case 2:
+                return hardTrack;
+
+            default:
+                return null;
+        }
+    }
+
+    public static PImage GetNote(int noteIndex) {
+        switch (noteIndex)
+        {
+            case 0:
+                return aNote;
+            
+            case 1:
+                return bNote;
+
+            case 2:
+                return cNote;
+
+            case 3:
+                return dNote;
+            
+            default:
+                return null;
+        }
+    }
+
+    public static void SetColour(int buttonIndex) {
+        switch (buttonIndex)
+        {
+            case 0:
+                BeatBot.instance.fill(37, 255, 195, 255);
+                BeatBot.instance.tint(37, 255, 195, 255);
+                break;
+                
+            case 1:
+                BeatBot.instance.fill(14, 20, 252, 255);
+                BeatBot.instance.tint(14, 20, 252, 255);
+                break;
+                
+            case 2:
+                BeatBot.instance.fill(236, 62, 200, 255);
+                BeatBot.instance.tint(236, 62, 200, 255);
+                break;
+                
+            case 3:
+                BeatBot.instance.fill(114, 8, 188, 255);
+                BeatBot.instance.tint(114, 8, 188, 255);
+                break;
+            
+            default:
+                BeatBot.instance.fill(255);
+                BeatBot.instance.tint(255);
+                break;
+        };
     }
 }
 static class SceneManager
@@ -403,10 +824,15 @@ static class SceneManager
     public static void Initialise()
     {
         currentSceneIndex = 0;
+        
         scenes = new Scene[] {
             BeatBot.instance.new MenuScene(),
-            BeatBot.instance.new GameScene()
+            BeatBot.instance.new GameScene(0, 90),
+            BeatBot.instance.new GameScene(1, 90),
+            BeatBot.instance.new GameScene(2, 90)
         };
+
+        Load(0);
     }
     
     public static void Draw()
@@ -423,7 +849,9 @@ static class SceneManager
     {
         if (index < 0 || index >= scenes.length)
             return;
-            
+        
+        scenes[currentSceneIndex].OnUnload();
+
         currentSceneIndex = index;
 
         Scene activeScene = ActiveScene();
@@ -460,6 +888,8 @@ abstract class Scene
     }
 
     public void OnLoad() {}
+
+    public void OnUnload() {}
 }
 abstract class Interface
 {
@@ -513,8 +943,9 @@ abstract class Button
         
         PushMatrix(buttonIndex, totalButtons);
 
+        rectMode(CORNER);
         strokeWeight(0);
-        SetColour(buttonIndex);
+        Resources.SetColour(buttonIndex);
 
         float rectLength = CalculateRectLength(buttonIndex, totalButtons);
         rect(0, 0, rectLength, buttonWidth);
@@ -530,32 +961,6 @@ abstract class Button
 
         translate(width - totalWidth + (totalWidth / (float) totalButtons) * buttonIndex, height);
         rotate(buttonAngle);
-    }
-
-    public void SetColour(int buttonIndex)
-    {
-        switch (buttonIndex)
-        {
-            case 0:
-                fill(37, 255, 195, 255);
-                break;
-                
-            case 1:
-                fill(14, 20, 252, 255);
-                break;
-                
-            case 2:
-                fill(236, 62, 200, 255);
-                break;
-                
-            case 3:
-                fill(114, 8, 188, 255);
-                break;
-            
-            default:
-                fill(255);
-                break;
-        };
     }
 }
 

@@ -11,8 +11,8 @@ class MenuScene extends Scene
             }),
             new MenuInterface(new Button[] {
                 new SceneNavButton(1, "Easy"),
-                new SceneNavButton(1, "Medium"),
-                new SceneNavButton(1, "Hard"),
+                new SceneNavButton(2, "Medium"),
+                new SceneNavButton(3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
             new MenuInterface(new Button[] {
@@ -28,6 +28,14 @@ class MenuScene extends Scene
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
         };
+    }
+
+    void OnLoad() {
+        Resources.menuTrack.loop(1, 0.01);
+    }
+
+    void OnUnload() {
+        Resources.menuTrack.stop();
     }
     
     void HandleInput(boolean[] inputs) {
@@ -53,6 +61,7 @@ class MenuScene extends Scene
         float xPos = width * 0.25;
         float yPos = height * 0.25;
 
+        tint(255);
         imageMode(CENTER);
         image(Resources.logoImage, xPos, yPos, sizeMax, sizeMax * aspect);
 
