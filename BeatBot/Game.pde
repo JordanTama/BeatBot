@@ -85,7 +85,17 @@ class GameScene extends Scene
         DrawEndLine();
         DrawText();
 
-        if (beatTime > beatTotal + buffer || missed >= 10)
+        if (missed >= 10) {
+            for (Note note : notes)
+                note.Trigger(beatTime);
+            for (Note note : activeNotes)
+                note.Trigger(beatTime);
+            
+            beatTotal = beatTime + buffer;
+            missed = 0;
+        }
+
+        if (beatTime > beatTotal + buffer)
             EndGame();
     }
 
