@@ -25,6 +25,8 @@ public class BeatBot extends PApplet {
 // MEMBER VARIABLES
 static Controller controller;
 static BeatBot instance;
+static float volume = 0.5f;
+static float score = 0;
 
 
 // EVENT FUNCTIONS
@@ -114,6 +116,7 @@ class GameScene extends Scene
     
     float bpm;
 
+    int total = 0;
     int missed = 0;
     float score = 0;
     float buffer = 4;
@@ -137,6 +140,8 @@ class GameScene extends Scene
     public void OnLoad() {
         track = Resources.GetTrack(difficultyIndex);
 
+        score = 0;
+
         time = 0;
         startTime = millis();
 
@@ -145,7 +150,7 @@ class GameScene extends Scene
 
         CreateNotes();
 
-        track.play(1, 0, 0.1f);
+        track.play(1, 0, 0.1f * BeatBot.volume);
     }
 
     public void HandleInput(boolean[] inputs) {
@@ -202,32 +207,36 @@ class GameScene extends Scene
 
     // Functions
     public void CreateNotes() {
-        // TODO: Go through the .dat file and convert to Notes.
+        randomSeed(1337);
 
         float pos = 0;
 
         while (pos <= beatTotal) {
             float t = pos;
+            float offset = 0;
 
             switch (difficultyIndex) {
                 case 0:
-                    t += RandomOffsetEasy();
+                    offset = RandomOffsetEasy();
                     break;
 
                 case 1:
-                    t += RandomOffsetMedium();
+                    offset = RandomOffsetMedium();
                     break;
                 
                 default:
-                    t += RandomOffsetHard();
+                    offset = RandomOffsetHard();
                     break;
             }
+            t += offset;
             pos = t;
 
             int index = (int) random(0, 4);
 
-            notes.add(new Note(index, pos, 0));
+            notes.add(new Note(index, pos, random(0, 15) < 1 && offset > 1 ? 1 : 0));
         }
+
+        total = notes.size();
     }
 
     public float RandomOffsetEasy() {
@@ -321,13 +330,26 @@ class GameScene extends Scene
     }
 
     public void DrawNote(Note note) {
+        // Draw Trail        
+        if (note.duration > 0) {
+            float xTrail = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
+            float yTrailStart = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
+            float yTrailEnd = map(beatTime - note.duration, note.beat - buffer, note.beat, startHeight, endHeight);
+
+            Resources.SetColour(note.inputIndex);
+
+            strokeWeight(30);
+            line(xTrail, yTrailStart, xTrail, yTrailEnd);
+        }
+
+        // Draw Note
         PImage img = Resources.GetNote(note.inputIndex);
 
         float x = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
         float y = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
 
         imageMode(CENTER);
-        tint(255, 255, 255, note.triggered ? map(beatTime, note.triggerStart, note.triggerStart + note.triggerDuration, 255, 0) : 255);
+        tint(255, 255, 255, note.triggered ? map(beatTime - note.duration, note.triggerStart - note.duration, note.triggerStart + note.triggerDuration - note.duration, 255, 0) : 255);
         image(img, x, y, 70, 70);
     }
 
@@ -344,8 +366,8 @@ class GameScene extends Scene
     }
 
     public void DrawEndLine() {
-        
         strokeWeight(5);
+
         int x = 0;
         while (x < width) {
             stroke(255);
@@ -408,7 +430,8 @@ class GameScene extends Scene
 
     public void EndGame() {
         track.stop();
-        SceneManager.Load(0);
+        BeatBot.score = score;
+        SceneManager.Load(4);
     }
 }
 
@@ -437,7 +460,43 @@ class Note
         
         triggered = true;
         triggerStart = beatTime;
-        Resources.selectSound.play();
+        Resources.selectSound.play(1, 0, 1 * BeatBot.volume);
+    }
+}
+class HelpScene extends Scene {
+    HelpScene() {
+        interfaces = new Interface[] {
+            new Interface(new Button[] {
+                null,
+                null,
+                null,
+                new SceneNavImageButton(0, Resources.homeImage)
+            })
+        };
+    }
+
+    public void HandleInput(boolean[] inputs) {
+        if (interfaces.length == 0)
+            return;
+
+        interfaces[currentInterface].HandleInput(inputs);
+    }
+
+    public void Draw() {
+        background(0);
+
+        rectMode(CORNER);
+        textAlign(LEFT);
+        textSize(30);
+
+        fill(255);
+        String helpText = "Tap the corresponding finger when a note reaches the line to score.\n";
+        text(helpText, 50, 50, width - 100, height - 100);
+
+        if (interfaces.length == 0)
+            return;
+        
+        interfaces[currentInterface].Draw();
     }
 }
 class Controller
@@ -551,30 +610,30 @@ class MenuScene extends Scene
     public MenuScene()
     {
         interfaces = new Interface[] {
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
                 new InterfaceNavButton(this, 1, "Play"),
                 new InterfaceNavButton(this, 2, "Options"),
-                new InterfaceNavButton(this, 3, "Help"),
+                new SceneNavButton(5, "Help"),
                 null
             }),
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
                 new SceneNavButton(1, "Easy"),
                 new SceneNavButton(2, "Medium"),
                 new SceneNavButton(3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
+                new VolumeButton(-0.2f),
+                new VolumeButton(0.2f),
+                null,
+                new InterfaceNavImageButton(this, 0, Resources.homeImage)
+            }),
+            new Interface(new Button[] {
                 null,
                 null,
                 null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
-            new MenuInterface(new Button[] {
-                null,
-                null,
-                null,
-                new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
+            })
         };
     }
 
@@ -590,14 +649,7 @@ class MenuScene extends Scene
         if (interfaces.length == 0)
             return;
 
-        for (int i = 0; i < inputs.length; i++)
-        {
-            if (!inputs[i])
-                continue;
-
-            interfaces[currentInterface].Select(i);
-            return;
-        }
+        interfaces[currentInterface].HandleInput(inputs);
     }
 
     public void Draw() {
@@ -623,39 +675,6 @@ class MenuScene extends Scene
             return;
         
         interfaces[currentInterface].Draw();
-    }
-}
-
-class MenuInterface extends Interface
-{
-    Button[] buttons;
-    
-    public MenuInterface(Button[] buttons)
-    {
-        this.buttons = buttons;
-    }
-    
-    public void Draw() {
-        for (int i = 0; i < buttons.length; i++) {
-            if (buttons[i] == null)
-                continue;
-            buttons[i].Draw(i, buttons.length);
-        }
-    }
-
-    public void Select(int index)
-    {
-        if (index < 0 || index >= buttons.length || buttons[index] == null)
-            return;
-
-        for (Button button : buttons){
-            if (button == null || button == buttons[index])
-                continue;
-            
-            button.Deselect();
-        }
-
-        buttons[index].Select();
     }
 }
 
@@ -713,11 +732,26 @@ class SceneNavButton extends LabelButton
         selected = false;
     }
 }
+
+class VolumeButton extends ImageButton {
+    float delta;
+
+    VolumeButton(float delta) {
+        this.delta = delta;
+        this.icon = delta < 0 ? Resources.volumeDownImage : Resources.volumeUpImage;
+    }
+
+    public void Invoke() {
+        BeatBot.volume = constrain(BeatBot.volume + delta, 0.0f, 1.0f);;
+    }
+}
 static class Resources
 {
     static PImage logoImage;
     static PImage homeImage;
     static PImage laneImage;
+    static PImage volumeUpImage;
+    static PImage volumeDownImage;
 
     static PImage aNote;
     static PImage bNote;
@@ -741,6 +775,8 @@ static class Resources
         logoImage = BeatBot.instance.loadImage("logo.png");
         homeImage = BeatBot.instance.loadImage("back.png");
         laneImage = BeatBot.instance.loadImage("lane.png");
+        volumeUpImage = BeatBot.instance.loadImage("volumeUp.png");
+        volumeDownImage = BeatBot.instance.loadImage("volumeDown.png");
 
         aNote = BeatBot.instance.loadImage("aNote.png");
         bNote = BeatBot.instance.loadImage("bNote.png");
@@ -801,26 +837,31 @@ static class Resources
             case 0:
                 BeatBot.instance.fill(37, 255, 195, 255);
                 BeatBot.instance.tint(37, 255, 195, 255);
+                BeatBot.instance.stroke(37, 255, 195, 255);
                 break;
                 
             case 1:
                 BeatBot.instance.fill(14, 20, 252, 255);
                 BeatBot.instance.tint(14, 20, 252, 255);
+                BeatBot.instance.stroke(14, 20, 252, 255);
                 break;
                 
             case 2:
                 BeatBot.instance.fill(236, 62, 200, 255);
                 BeatBot.instance.tint(236, 62, 200, 255);
+                BeatBot.instance.stroke(236, 62, 200, 255);
                 break;
                 
             case 3:
                 BeatBot.instance.fill(114, 8, 188, 255);
                 BeatBot.instance.tint(114, 8, 188, 255);
+                BeatBot.instance.stroke(114, 8, 188, 255);
                 break;
             
             default:
                 BeatBot.instance.fill(255);
                 BeatBot.instance.tint(255);
+                BeatBot.instance.stroke(255);
                 break;
         };
     }
@@ -836,9 +877,11 @@ static class SceneManager
         
         scenes = new Scene[] {
             BeatBot.instance.new MenuScene(),
-            BeatBot.instance.new GameScene(0, 90),
-            BeatBot.instance.new GameScene(1, 90),
-            BeatBot.instance.new GameScene(2, 90)
+            BeatBot.instance.new GameScene(0, 130),
+            BeatBot.instance.new GameScene(1, 130),
+            BeatBot.instance.new GameScene(2, 130),
+            BeatBot.instance.new ScoreScene(),
+            BeatBot.instance.new HelpScene()
         };
 
         Load(0);
@@ -900,10 +943,99 @@ abstract class Scene
 
     public void OnUnload() {}
 }
-abstract class Interface
+class ScoreScene extends Scene {
+    ScoreScene() {
+        interfaces = new Interface[] {
+            new Interface(new Button[] {
+                null,
+                null,
+                null,
+                new SceneNavImageButton(0, Resources.homeImage)
+            })
+        };
+    }
+
+    public void HandleInput(boolean[] inputs) {
+        if (interfaces.length == 0)
+            return;
+
+        interfaces[currentInterface].HandleInput(inputs);
+    }
+
+    public void Draw() {
+        background(0);
+
+        rectMode(CENTER);
+        textAlign(CENTER);
+        textSize(40);
+
+        fill(255);
+        text("Score " + (int) (BeatBot.score * 100) + "%", width / 2, height / 2, width, 100);
+
+        if (interfaces.length == 0)
+            return;
+        
+        interfaces[currentInterface].Draw();
+    }
+}
+
+class SceneNavImageButton extends ImageButton
 {
-    public abstract void Draw();
-    public abstract void Select(int index);
+    int targetIndex;
+
+    SceneNavImageButton(int targetIndex, PImage icon)
+    {
+        super(icon);
+
+        this.targetIndex = targetIndex;
+    }
+    
+    public void Invoke() {
+        SceneManager.Load(targetIndex);
+        selected = false;
+    }
+}
+class Interface
+{
+    Button[] buttons;
+
+    public Interface(Button[] buttons) {
+        this.buttons = buttons;
+    }
+    
+    public void Draw() {
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i] == null)
+                continue;
+            buttons[i].Draw(i, buttons.length);
+        }
+    }
+
+    public void Select(int index)
+    {
+        if (index < 0 || index >= buttons.length || buttons[index] == null)
+            return;
+
+        for (Button button : buttons){
+            if (button == null || button == buttons[index])
+                continue;
+            
+            button.Deselect();
+        }
+
+        buttons[index].Select();
+    }
+
+    public void HandleInput(boolean[] inputs) {
+        for (int i = 0; i < inputs.length; i++)
+        {
+            if (!inputs[i])
+                continue;
+
+            Select(i);
+            return;
+        }
+    }
 }
 
 abstract class Button
@@ -918,12 +1050,12 @@ abstract class Button
         if (selected) {
             Invoke();
             selected = false;
-            Resources.confirmSound.play();
+            Resources.confirmSound.play(1, 0, BeatBot.volume);
             return;
         }
 
         selected = true;
-        Resources.selectSound.play();
+        Resources.selectSound.play(1, 0, BeatBot.volume);
     }
     
     public void Deselect() {

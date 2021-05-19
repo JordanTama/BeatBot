@@ -1,7 +1,44 @@
-abstract class Interface
+class Interface
 {
-    abstract void Draw();
-    abstract void Select(int index);
+    Button[] buttons;
+
+    public Interface(Button[] buttons) {
+        this.buttons = buttons;
+    }
+    
+    void Draw() {
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i] == null)
+                continue;
+            buttons[i].Draw(i, buttons.length);
+        }
+    }
+
+    void Select(int index)
+    {
+        if (index < 0 || index >= buttons.length || buttons[index] == null)
+            return;
+
+        for (Button button : buttons){
+            if (button == null || button == buttons[index])
+                continue;
+            
+            button.Deselect();
+        }
+
+        buttons[index].Select();
+    }
+
+    void HandleInput(boolean[] inputs) {
+        for (int i = 0; i < inputs.length; i++)
+        {
+            if (!inputs[i])
+                continue;
+
+            Select(i);
+            return;
+        }
+    }
 }
 
 abstract class Button
@@ -16,12 +53,12 @@ abstract class Button
         if (selected) {
             Invoke();
             selected = false;
-            Resources.confirmSound.play();
+            Resources.confirmSound.play(1, 0, BeatBot.volume);
             return;
         }
 
         selected = true;
-        Resources.selectSound.play();
+        Resources.selectSound.play(1, 0, BeatBot.volume);
     }
     
     void Deselect() {

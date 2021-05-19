@@ -6,6 +6,8 @@ import processing.sound.*;
 // MEMBER VARIABLES
 static Controller controller;
 static BeatBot instance;
+static float volume = 0.5;
+static float score = 0;
 
 
 // EVENT FUNCTIONS

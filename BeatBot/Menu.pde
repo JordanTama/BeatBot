@@ -3,30 +3,30 @@ class MenuScene extends Scene
     public MenuScene()
     {
         interfaces = new Interface[] {
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
                 new InterfaceNavButton(this, 1, "Play"),
                 new InterfaceNavButton(this, 2, "Options"),
-                new InterfaceNavButton(this, 3, "Help"),
+                new SceneNavButton(5, "Help"),
                 null
             }),
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
                 new SceneNavButton(1, "Easy"),
                 new SceneNavButton(2, "Medium"),
                 new SceneNavButton(3, "Hard"),
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
             }),
-            new MenuInterface(new Button[] {
+            new Interface(new Button[] {
+                new VolumeButton(-0.2),
+                new VolumeButton(0.2),
+                null,
+                new InterfaceNavImageButton(this, 0, Resources.homeImage)
+            }),
+            new Interface(new Button[] {
                 null,
                 null,
                 null,
                 new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
-            new MenuInterface(new Button[] {
-                null,
-                null,
-                null,
-                new InterfaceNavImageButton(this, 0, Resources.homeImage)
-            }),
+            })
         };
     }
 
@@ -42,14 +42,7 @@ class MenuScene extends Scene
         if (interfaces.length == 0)
             return;
 
-        for (int i = 0; i < inputs.length; i++)
-        {
-            if (!inputs[i])
-                continue;
-
-            interfaces[currentInterface].Select(i);
-            return;
-        }
+        interfaces[currentInterface].HandleInput(inputs);
     }
 
     void Draw() {
@@ -75,39 +68,6 @@ class MenuScene extends Scene
             return;
         
         interfaces[currentInterface].Draw();
-    }
-}
-
-class MenuInterface extends Interface
-{
-    Button[] buttons;
-    
-    public MenuInterface(Button[] buttons)
-    {
-        this.buttons = buttons;
-    }
-    
-    void Draw() {
-        for (int i = 0; i < buttons.length; i++) {
-            if (buttons[i] == null)
-                continue;
-            buttons[i].Draw(i, buttons.length);
-        }
-    }
-
-    void Select(int index)
-    {
-        if (index < 0 || index >= buttons.length || buttons[index] == null)
-            return;
-
-        for (Button button : buttons){
-            if (button == null || button == buttons[index])
-                continue;
-            
-            button.Deselect();
-        }
-
-        buttons[index].Select();
     }
 }
 
@@ -163,5 +123,18 @@ class SceneNavButton extends LabelButton
     void Invoke() {
         SceneManager.Load(targetIndex);
         selected = false;
+    }
+}
+
+class VolumeButton extends ImageButton {
+    float delta;
+
+    VolumeButton(float delta) {
+        this.delta = delta;
+        this.icon = delta < 0 ? Resources.volumeDownImage : Resources.volumeUpImage;
+    }
+
+    void Invoke() {
+        BeatBot.volume = constrain(BeatBot.volume + delta, 0.0, 1.0);;
     }
 }

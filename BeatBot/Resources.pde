@@ -3,6 +3,8 @@ static class Resources
     static PImage logoImage;
     static PImage homeImage;
     static PImage laneImage;
+    static PImage volumeUpImage;
+    static PImage volumeDownImage;
 
     static PImage aNote;
     static PImage bNote;
@@ -26,6 +28,8 @@ static class Resources
         logoImage = BeatBot.instance.loadImage("logo.png");
         homeImage = BeatBot.instance.loadImage("back.png");
         laneImage = BeatBot.instance.loadImage("lane.png");
+        volumeUpImage = BeatBot.instance.loadImage("volumeUp.png");
+        volumeDownImage = BeatBot.instance.loadImage("volumeDown.png");
 
         aNote = BeatBot.instance.loadImage("aNote.png");
         bNote = BeatBot.instance.loadImage("bNote.png");
@@ -86,26 +90,31 @@ static class Resources
             case 0:
                 BeatBot.instance.fill(37, 255, 195, 255);
                 BeatBot.instance.tint(37, 255, 195, 255);
+                BeatBot.instance.stroke(37, 255, 195, 255);
                 break;
                 
             case 1:
                 BeatBot.instance.fill(14, 20, 252, 255);
                 BeatBot.instance.tint(14, 20, 252, 255);
+                BeatBot.instance.stroke(14, 20, 252, 255);
                 break;
                 
             case 2:
                 BeatBot.instance.fill(236, 62, 200, 255);
                 BeatBot.instance.tint(236, 62, 200, 255);
+                BeatBot.instance.stroke(236, 62, 200, 255);
                 break;
                 
             case 3:
                 BeatBot.instance.fill(114, 8, 188, 255);
                 BeatBot.instance.tint(114, 8, 188, 255);
+                BeatBot.instance.stroke(114, 8, 188, 255);
                 break;
             
             default:
                 BeatBot.instance.fill(255);
                 BeatBot.instance.tint(255);
+                BeatBot.instance.stroke(255);
                 break;
         };
     }

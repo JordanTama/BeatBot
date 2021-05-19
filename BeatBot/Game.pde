@@ -13,6 +13,7 @@ class GameScene extends Scene
     
     float bpm;
 
+    int total = 0;
     int missed = 0;
     float score = 0;
     float buffer = 4;
@@ -36,6 +37,8 @@ class GameScene extends Scene
     void OnLoad() {
         track = Resources.GetTrack(difficultyIndex);
 
+        score = 0;
+
         time = 0;
         startTime = millis();
 
@@ -44,7 +47,7 @@ class GameScene extends Scene
 
         CreateNotes();
 
-        track.play(1, 0, 0.1);
+        track.play(1, 0, 0.1 * BeatBot.volume);
     }
 
     void HandleInput(boolean[] inputs) {
@@ -101,32 +104,36 @@ class GameScene extends Scene
 
     // Functions
     void CreateNotes() {
-        // TODO: Go through the .dat file and convert to Notes.
+        randomSeed(1337);
 
         float pos = 0;
 
         while (pos <= beatTotal) {
             float t = pos;
+            float offset = 0;
 
             switch (difficultyIndex) {
                 case 0:
-                    t += RandomOffsetEasy();
+                    offset = RandomOffsetEasy();
                     break;
 
                 case 1:
-                    t += RandomOffsetMedium();
+                    offset = RandomOffsetMedium();
                     break;
                 
                 default:
-                    t += RandomOffsetHard();
+                    offset = RandomOffsetHard();
                     break;
             }
+            t += offset;
             pos = t;
 
             int index = (int) random(0, 4);
 
-            notes.add(new Note(index, pos, 0));
+            notes.add(new Note(index, pos, random(0, 15) < 1 && offset > 1 ? 1 : 0));
         }
+
+        total = notes.size();
     }
 
     float RandomOffsetEasy() {
@@ -220,6 +227,19 @@ class GameScene extends Scene
     }
 
     void DrawNote(Note note) {
+        // Draw Trail        
+        if (note.duration > 0) {
+            float xTrail = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
+            float yTrailStart = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
+            float yTrailEnd = map(beatTime - note.duration, note.beat - buffer, note.beat, startHeight, endHeight);
+
+            Resources.SetColour(note.inputIndex);
+
+            strokeWeight(30);
+            line(xTrail, yTrailStart, xTrail, yTrailEnd);
+        }
+
+        // Draw Note
         PImage img = Resources.GetNote(note.inputIndex);
 
         float x = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
@@ -243,8 +263,8 @@ class GameScene extends Scene
     }
 
     void DrawEndLine() {
-        
         strokeWeight(5);
+
         int x = 0;
         while (x < width) {
             stroke(255);
@@ -307,7 +327,8 @@ class GameScene extends Scene
 
     void EndGame() {
         track.stop();
-        SceneManager.Load(0);
+        BeatBot.score = score;
+        SceneManager.Load(4);
     }
 }
 
@@ -336,6 +357,6 @@ class Note
         
         triggered = true;
         triggerStart = beatTime;
-        Resources.selectSound.play();
+        Resources.selectSound.play(1, 0, 1 * BeatBot.volume);
     }
 }

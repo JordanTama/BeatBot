@@ -9,9 +9,11 @@ static class SceneManager
         
         scenes = new Scene[] {
             BeatBot.instance.new MenuScene(),
-            BeatBot.instance.new GameScene(0, 90),
-            BeatBot.instance.new GameScene(1, 90),
-            BeatBot.instance.new GameScene(2, 90)
+            BeatBot.instance.new GameScene(0, 130),
+            BeatBot.instance.new GameScene(1, 130),
+            BeatBot.instance.new GameScene(2, 130),
+            BeatBot.instance.new ScoreScene(),
+            BeatBot.instance.new HelpScene()
         };
 
         Load(0);
