@@ -1,4 +1,4 @@
-const bool usingJoystick = true;
+const bool usingJoystick = false;
 
 const int xPin = A0;
 const int yPin = A1;
