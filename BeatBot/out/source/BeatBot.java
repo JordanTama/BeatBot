@@ -130,6 +130,7 @@ class GameScene extends Scene
     ArrayList<Note> activeNotes = new ArrayList<Note>();
 
 
+    // Constructors
     GameScene(int difficultyIndex, int bpm) {
         this.difficultyIndex = difficultyIndex;
         this.bpm = bpm;
@@ -447,8 +448,7 @@ class Note
 
     final float triggerDuration = 1;
 
-    public Note(int inputIndex, float beat, float duration)
-    {
+    public Note(int inputIndex, float beat, float duration){
         this.inputIndex = inputIndex;
         this.beat = beat;
         this.duration = duration;
@@ -970,7 +970,7 @@ class ScoreScene extends Scene {
         textSize(40);
 
         fill(255);
-        text("Score " + (int) (BeatBot.score * 100) + "%", width / 2, height / 2, width, 100);
+        text("Score " + (int) (BeatBot.score), width / 2, height / 2, width, 100);
 
         if (interfaces.length == 0)
             return;

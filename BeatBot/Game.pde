@@ -345,8 +345,7 @@ class Note
 
     final float triggerDuration = 1;
 
-    public Note(int inputIndex, float beat, float duration)
-    {
+    public Note(int inputIndex, float beat, float duration){
         this.inputIndex = inputIndex;
         this.beat = beat;
         this.duration = duration;

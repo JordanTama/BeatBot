@@ -25,7 +25,7 @@ class ScoreScene extends Scene {
         textSize(40);
 
         fill(255);
-        text("Score " + (int) (BeatBot.score * 100) + "%", width / 2, height / 2, width, 100);
+        text("Score " + (int) (BeatBot.score), width / 2, height / 2, width, 100);
 
         if (interfaces.length == 0)
             return;
