@@ -27,6 +27,7 @@ class GameScene extends Scene
     ArrayList<Note> activeNotes = new ArrayList<Note>();
 
 
+    // Constructors
     GameScene(int difficultyIndex, int bpm) {
         this.difficultyIndex = difficultyIndex;
         this.bpm = bpm;

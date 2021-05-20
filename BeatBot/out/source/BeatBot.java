@@ -349,7 +349,7 @@ class GameScene extends Scene
         float y = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
 
         imageMode(CENTER);
-        tint(255, 255, 255, note.triggered ? map(beatTime - note.duration, note.triggerStart - note.duration, note.triggerStart + note.triggerDuration - note.duration, 255, 0) : 255);
+        tint(255, 255, 255, note.triggered ? map(beatTime, note.triggerStart, note.triggerStart + note.triggerDuration, 255, 0) : 255);
         image(img, x, y, 70, 70);
     }
 
