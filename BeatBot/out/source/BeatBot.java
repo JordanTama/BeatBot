@@ -131,8 +131,8 @@ class GameScene extends Scene
     float score = 0;
 
     float laneWidth = 110;
-    float startHeight = -100;
-    float endHeight = height - 200;
+    float startHeight = -70;
+    float endHeight = height - 70;
 
     boolean paused;
 
@@ -152,8 +152,8 @@ class GameScene extends Scene
             new Button[] {
                 new VolumeButton(-0.2f),
                 new VolumeButton(+0.2f),
-                null,
-                new ResumeButton(this)
+                new ResumeButton(this),
+                new HomeButton()
                 }
             )};
     }
@@ -206,7 +206,7 @@ class GameScene extends Scene
         UpdateActive();
 
         // Draw the background
-        background(0);
+        background(0, 1);
         for (int i = 0; i < 4; i++)
             DrawLane(i);
 
@@ -238,6 +238,8 @@ class GameScene extends Scene
 
     // Functions
     public void CreateNotes() {
+        notes = new ArrayList<Note>();
+        activeNotes = new ArrayList<Note>();
         
         switch (difficultyIndex) {
             case 0:
@@ -524,7 +526,9 @@ class GameInterface extends Interface
     }
 
     public void Draw() {
-        // background(0, 0, 0, 5);
+        fill(0, 0, 0, 127);
+        rectMode(CORNER);
+        rect(0, 0, width, height);
         super.Draw();
     }
 }
@@ -539,6 +543,18 @@ class ResumeButton extends ImageButton {
     
     public void Invoke() {
         scene.Play();
+    }
+}
+
+class HomeButton extends ImageButton
+{
+    HomeButton() {
+        this.icon = Resources.homeImage;
+    }
+    
+    public void Invoke() {
+        SceneManager.Load(0);
+        selected = false;
     }
 }
 class HelpScene extends Scene {
@@ -1261,7 +1277,7 @@ class ImageButton extends Button
         tint(255);
     }
 }
-    public void settings() {  size(800, 600); }
+    public void settings() {  size(800, 480); }
     static public void main(String[] passedArgs) {
         String[] appletArgs = new String[] { "BeatBot" };
         if (passedArgs != null) {

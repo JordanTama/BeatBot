@@ -20,7 +20,7 @@ void setup()
 
     controller = new Controller();
 
-    size(800, 600);
+    size(800, 480);
     textFont(Resources.font);
 }
 
