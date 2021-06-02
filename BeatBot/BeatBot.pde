@@ -74,6 +74,14 @@ void keyReleased()
     }
 }
 
+void mousePressed() {
+    if (!(SceneManager.scenes[SceneManager.currentSceneIndex] instanceof GameScene))
+        return;
+
+    GameScene currentGameScene = (GameScene) SceneManager.scenes[SceneManager.currentSceneIndex];
+    currentGameScene.Pause();
+}
+
 // FUNCTIONS
 void HandleInput()
 {

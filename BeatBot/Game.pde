@@ -3,7 +3,7 @@ class GameScene extends Scene
     // Member variables
     SoundFile track;
 
-    float startTime;
+    float previousTime;
     float time;
 
     float beatTime;
@@ -23,6 +23,8 @@ class GameScene extends Scene
     float startHeight = -100;
     float endHeight = height - 200;
 
+    boolean paused;
+
     ArrayList<Note> notes = new ArrayList<Note>();
     ArrayList<Note> activeNotes = new ArrayList<Note>();
 
@@ -31,6 +33,15 @@ class GameScene extends Scene
     GameScene(int difficultyIndex, int bpm) {
         this.difficultyIndex = difficultyIndex;
         this.bpm = bpm;
+
+        interfaces = new Interface[] {new GameInterface(
+            new Button[] {
+                new VolumeButton(-0.2),
+                new VolumeButton(+0.2),
+                null,
+                new ResumeButton(this)
+                }
+            )};
     }
 
 
@@ -41,7 +52,7 @@ class GameScene extends Scene
         score = 0;
 
         time = 0;
-        startTime = millis();
+        previousTime = millis();
 
         beatTime = -buffer * 2;
         beatTotal = (track.duration() / 60.0 * bpm) + beatTime;
@@ -52,6 +63,9 @@ class GameScene extends Scene
     }
 
     void HandleInput(boolean[] inputs) {
+        if (paused)
+            interfaces[0].HandleInput(inputs);
+
         for (int i = 0; i < inputs.length; i++)
         {
             if (!inputs[i])
@@ -70,9 +84,10 @@ class GameScene extends Scene
         }
     }
 
-    void Draw() {
+    void Draw()
+    {
         HandleTimer();
-
+            
         // Spawn in notes
         UpdateActive();
 
@@ -88,6 +103,10 @@ class GameScene extends Scene
         // Draw the UI
         DrawEndLine();
         DrawText();
+
+        if (paused) {
+            interfaces[0].Draw();
+        }
 
         if (missed >= 10) {
             for (Note note : notes)
@@ -231,8 +250,10 @@ class GameScene extends Scene
         // Draw Trail        
         if (note.duration > 0) {
             float xTrail = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
-            float yTrailStart = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
-            float yTrailEnd = map(beatTime - note.duration, note.beat - buffer, note.beat, startHeight, endHeight);
+            float yTrailStart = map(note.triggered ? note.triggerStart : beatTime,
+                note.beat - buffer, note.beat, startHeight, endHeight);
+            float yTrailEnd = map(beatTime - note.duration,
+                note.beat - buffer, note.beat, startHeight, endHeight);
 
             Resources.SetColour(note.inputIndex);
 
@@ -244,10 +265,13 @@ class GameScene extends Scene
         PImage img = Resources.GetNote(note.inputIndex);
 
         float x = (width - laneWidth * 3) / 2 + note.inputIndex * laneWidth;
-        float y = map(note.triggered ? note.triggerStart : beatTime, note.beat - buffer, note.beat, startHeight, endHeight);
+        float y = map(note.triggered ? note.triggerStart : beatTime,
+            note.beat - buffer, note.beat, startHeight, endHeight);
 
         imageMode(CENTER);
-        tint(255, 255, 255, note.triggered ? map(beatTime, note.triggerStart, note.triggerStart + note.triggerDuration, 255, 0) : 255);
+        tint(255, 255, 255, note.triggered ? map(
+            beatTime, note.triggerStart, note.triggerStart + note.triggerDuration, 255, 0
+            ) : 255);
         image(img, x, y, 70, 70);
     }
 
@@ -316,20 +340,30 @@ class GameScene extends Scene
         text(difficultyLabel, x, y, 100, 30);
     }
 
-    float HandleTimer() {
-        float currentTime = millis() - startTime;
-        float delta = (currentTime - time) / 60000 * bpm;
-        time = currentTime;
+    void HandleTimer() {
+        float delta = millis() - previousTime;
 
-        beatTime += delta;
+        previousTime += delta;
 
-        return delta;
+        if (!paused)
+            beatTime += delta / 60000 * bpm;
     }
 
     void EndGame() {
         track.stop();
         BeatBot.score = score;
         SceneManager.Load(4);
+    }
+
+    void Pause() {
+        paused = true;
+        track.pause();
+    }
+
+    void Play() {
+        paused = false;
+        track.amp(0.1 * BeatBot.volume);
+        track.play();
     }
 }
 
@@ -358,5 +392,30 @@ class Note
         triggered = true;
         triggerStart = beatTime;
         Resources.selectSound.play(1, 0, 1 * BeatBot.volume);
+    }
+}
+
+class GameInterface extends Interface
+{
+    GameInterface(Button[] buttons) {
+        super(buttons);
+    }
+
+    void Draw() {
+        // background(0, 0, 0, 5);
+        super.Draw();
+    }
+}
+
+class ResumeButton extends ImageButton {
+    GameScene scene;
+
+    ResumeButton(GameScene scene) {
+        this.scene = scene;
+        this.icon = Resources.playImage;
+    }
+    
+    void Invoke() {
+        scene.Play();
     }
 }

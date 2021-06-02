@@ -5,6 +5,7 @@ static class Resources
     static PImage laneImage;
     static PImage volumeUpImage;
     static PImage volumeDownImage;
+    static PImage playImage;
 
     static PImage aNote;
     static PImage bNote;
@@ -30,6 +31,7 @@ static class Resources
         laneImage = BeatBot.instance.loadImage("lane.png");
         volumeUpImage = BeatBot.instance.loadImage("volumeUp.png");
         volumeDownImage = BeatBot.instance.loadImage("volumeDown.png");
+        playImage = BeatBot.instance.loadImage("play.png");
 
         aNote = BeatBot.instance.loadImage("aNote.png");
         bNote = BeatBot.instance.loadImage("bNote.png");
