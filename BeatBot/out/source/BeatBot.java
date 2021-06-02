@@ -123,12 +123,12 @@ class GameScene extends Scene
     int difficultyIndex;
     
     float bpm;
+    float buffer;
+    float lenience;
 
     int total = 0;
     int missed = 0;
     float score = 0;
-    float buffer = 4;
-    float lenience = 1;
 
     float laneWidth = 110;
     float startHeight = -100;
@@ -141,9 +141,12 @@ class GameScene extends Scene
 
 
     // Constructors
-    GameScene(int difficultyIndex, int bpm) {
+    GameScene(int difficultyIndex, int bpm, float buffer) {
         this.difficultyIndex = difficultyIndex;
         this.bpm = bpm;
+        this.buffer = buffer;
+
+        lenience = buffer / 4;
 
         interfaces = new Interface[] {new GameInterface(
             new Button[] {
@@ -235,7 +238,18 @@ class GameScene extends Scene
 
     // Functions
     public void CreateNotes() {
-        randomSeed(1337);
+        
+        switch (difficultyIndex) {
+            case 0:
+                randomSeed(123);
+                break;
+            case 1:
+                randomSeed(1337);
+                break;
+            case 2:
+                randomSeed(2048);
+        }
+
 
         float pos = 0;
 
@@ -268,27 +282,24 @@ class GameScene extends Scene
     }
 
     public float RandomOffsetEasy() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(3);
         switch (rand) {
             case 0:
                 return 1;
 
             case 1:
-                return 1.5f;
-            
-            case 2:
                 return 2;
             
-            case 3:
-                return 2.5f;
+            case 2:
+                return 3;
             
             default:
-                return 3;
+                return 0;
         }
     }
 
     public float RandomOffsetMedium() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(5);
         switch (rand) {
             case 0:
                 return 0.5f;
@@ -308,7 +319,7 @@ class GameScene extends Scene
     }
 
     public float RandomOffsetHard() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(0, 5);
         switch (rand) {
             case 0:
                 return 0.25f;
@@ -947,9 +958,9 @@ static class SceneManager
         
         scenes = new Scene[] {
             BeatBot.instance.new MenuScene(),
-            BeatBot.instance.new GameScene(0, 130),
-            BeatBot.instance.new GameScene(1, 130),
-            BeatBot.instance.new GameScene(2, 130),
+            BeatBot.instance.new GameScene(0, 130, 4),
+            BeatBot.instance.new GameScene(1, 130, 3),
+            BeatBot.instance.new GameScene(2, 130, 2),
             BeatBot.instance.new ScoreScene(),
             BeatBot.instance.new HelpScene()
         };

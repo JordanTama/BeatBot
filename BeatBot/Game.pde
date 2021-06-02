@@ -12,12 +12,12 @@ class GameScene extends Scene
     int difficultyIndex;
     
     float bpm;
+    float buffer;
+    float lenience;
 
     int total = 0;
     int missed = 0;
     float score = 0;
-    float buffer = 4;
-    float lenience = 1;
 
     float laneWidth = 110;
     float startHeight = -100;
@@ -30,9 +30,12 @@ class GameScene extends Scene
 
 
     // Constructors
-    GameScene(int difficultyIndex, int bpm) {
+    GameScene(int difficultyIndex, int bpm, float buffer) {
         this.difficultyIndex = difficultyIndex;
         this.bpm = bpm;
+        this.buffer = buffer;
+
+        lenience = buffer / 4;
 
         interfaces = new Interface[] {new GameInterface(
             new Button[] {
@@ -124,7 +127,18 @@ class GameScene extends Scene
 
     // Functions
     void CreateNotes() {
-        randomSeed(1337);
+        
+        switch (difficultyIndex) {
+            case 0:
+                randomSeed(123);
+                break;
+            case 1:
+                randomSeed(1337);
+                break;
+            case 2:
+                randomSeed(2048);
+        }
+
 
         float pos = 0;
 
@@ -157,27 +171,24 @@ class GameScene extends Scene
     }
 
     float RandomOffsetEasy() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(3);
         switch (rand) {
             case 0:
                 return 1;
 
             case 1:
-                return 1.5;
-            
-            case 2:
                 return 2;
             
-            case 3:
-                return 2.5;
+            case 2:
+                return 3;
             
             default:
-                return 3;
+                return 0;
         }
     }
 
     float RandomOffsetMedium() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(5);
         switch (rand) {
             case 0:
                 return 0.5;
@@ -197,7 +208,7 @@ class GameScene extends Scene
     }
 
     float RandomOffsetHard() {
-        int rand = (int) random(0, 4);
+        int rand = (int) random(0, 5);
         switch (rand) {
             case 0:
                 return 0.25;
